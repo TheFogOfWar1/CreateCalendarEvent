@@ -1,17 +1,17 @@
-function createICSFile(title, description, summary){
+function createICSFile(){
     var ICStitle = "";
     var ICSdescription = "";
     var ICSsummary = "";
-
+    var fileName = ""
     var today = new Date();
+    var startTime = new Date()
+    var endTime = new Date();
 
-    ICStitle = document.getElementById("title").value;
-    ICSdescription = document.getElementById("description").value;
-    ICSsummary = document.getElementById("summary").value;
+    ICSdescription = document.getElementById("description").value; //long description for calendar event
+    ICSsummary = document.getElementById("summary").value; //summary of event
+    fileName = document.getElementById("title").value + ".ics"; //fileName with extension
 
-    console.log(ICStitle);
-    console.log(ICSdescription);
-    console.log(ICSsummary);
+    endTime.setHours(today.getHours() + 2); //Generates an endtime for your event. You should remove this and use your own endtime.
 
     /*
       An ICS File needs a specific timestamp
@@ -19,21 +19,22 @@ function createICSFile(title, description, summary){
     */
     function setTime(d){
       var date = new Date(d);
-      var yearMonthDay = date.getFullYear() + addZero(date.getMonth()) + addZero(date.getDate());
-      var hourMinuteSec = addZero(date.getHours() + addZero(date.getMinutes()) + "00");
-      var total = yearMonthDay + "T" + hourMinuteSec;
-      console.log(total);
+      var yearMonthDay = date.getFullYear() + slicer(date.getMonth() + 1)
+                         + slicer(date.getDate());
+      var hourMinuteSec = slicer(date.getHours()) + slicer(date.getMinutes())
+                         + '00';
+      var total = yearMonthDay + 'T' + hourMinuteSec;
+
       return total;
 
     }
 
-    function addZero(i){
-      if (i < 10) {
-        i = "0" + i;
-      }
-      return i;
+    //datefixer
+    function slicer(s){
+      return ("0" + s).slice(-2);
     }
 
+    //internal layout in the file, in line with the code conventions
     icsLines = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
@@ -42,24 +43,37 @@ function createICSFile(title, description, summary){
       "BEGIN:VEVENT",
       "UID:event-" + today.getTime() + "@somewhere.com",
       "DTSTAMP:" + setTime(today),
-      "DTSTART:" + setTime(today),
-      "DTEND:" ,
+      "DTSTART:" + setTime(startTime),
+      "DTEND:" + setTime(endTime),
       "DESCRIPTION:" + ICSdescription,
       "SUMMARY:" + ICSsummary,
-      "LAST-MODIFIED:" + today.getTime,
+      "LAST-MODIFIED:" + setTime(today),
       "SEQUENCE:0",
       "END:VEVENT",
       "END:VCALENDAR"
     ];
+    
+    //saves file
+    function saveFile(fileURL){
+      if (!window.ActiveXObject) {
+         var save = document.createElement('a');
+         save.href = fileURL;
+         save.target = '_blank';
+         save.download = fileName || 'unknown';
+         var evt = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': false
+         });
+         save.dispatchEvent(evt);
 
-    var file = 'data:text/calendar;base64' + encodeURI(icsLines.join('\r\n'));
+         (window.URL || window.webkitURL).revokeObjectURL(save.href);
 
-    function downloadICS(){
-      var hiddenElement = document.createElement('a');
-
-      hiddenElement.target = '_blank';
-      hiddenElement.download = 'calendarEvent.ics';
-      hiddenElement.click();
+      }
     }
-    download
+
+    var dlurl = 'data:text/calendar;base64,' + btoa(icsLines.join('\r\n'));
+
+    saveFile(dlurl);
+
 }

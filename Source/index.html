@@ -2,6 +2,9 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a calendar event</title>
   <script src="createCalendarEvent.js" type="text/javascript"></script>
 </head>
 
@@ -11,12 +14,12 @@
   <h3>Creates calendar event for next 2 hours</h3>
   <h3>Fill in event data</h3>
 
-  <input type="text" name="title" value="title" id="title">
-  <input type="text" name="description" value="description" id="description">
+  <input type="text" name="title" value="Name of file" id="title">
+  <textarea rows="10" cols="30" id="description">Fill in the description of your event in here...</textarea>
   <input type="text" name="summary" value="summary" id="summary">
 
   <h2>Click this to create ics file</h2>
-  <button type="button" name="Create calendar event" onclick="createICSFile(title, description, summary)">Create Calendar Event</button>
+  <button type="button" name="Create calendar event" onclick="createICSFile()">Create Calendar Event</button>
 
 </body>
 
